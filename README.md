@@ -35,14 +35,14 @@ pip install pandas plotly kaleido openpyxl
 ```
 
 ## 📂 Estrutura do projeto
-
+```bash
 C:/bigdata/
-│
+
 ├── Planejamento (1).xlsx   # Arquivo Excel com os dados
 ├── main.py                 # Script principal
 ├── graficos/               # Pasta onde os PNGs serão salvos
 └── dashboard.html          # Dashboard único com todos os gráficos
-
+```
 ▶️ Como rodar
 Coloque o arquivo Planejamento (1).xlsx dentro da pasta C:/bigdata.
 
