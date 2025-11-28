@@ -60,9 +60,9 @@ df_reservas = pd.concat([
 df_reservas["Valor"] = pd.to_numeric(df_reservas["Valor"], errors="coerce")
 df_reservas = df_reservas.dropna(subset=["Valor"])
 
-# ========================
+# 
 # GRÁFICOS
-# ========================
+# 
 COLOR1 = "#4A90E2"
 COLOR2 = "#FF6F61"
 COLOR3 = "#50C878"
@@ -93,15 +93,15 @@ fig3 = px.pie(df_reservas, names="Status", values="Valor",
 fig4 = px.line(df_ciclo_std, x="Produto", y=["Liberada", "Bloqueada", "Produção"],
                markers=True, title="Status dos Pedidos por Produto (Linha)")
 
-# 5 — Novo: Barras Reservas por Status
+# 5 — Barras Reservas por Status
 df_reservas_sum = df_reservas.groupby("Status", as_index=False)["Valor"].sum()
 fig5 = px.bar(df_reservas_sum, x="Status", y="Valor", color="Status",
               title="Total de Reservas por Status (Barras)",
               color_discrete_map={"Parcial": COLOR1, "Integral": COLOR3, "Crédito": COLOR2})
 
-# ===========================
+#
 # DASHBOARD COM 5 GRÁFICOS
-# ===========================
+# 
 from plotly.subplots import make_subplots
 
 fig_total = make_subplots(
@@ -133,9 +133,10 @@ fig_total.update_layout(height=4200, width=1100, template="plotly_white",
 
 fig_total.show()
 
-# Conexão com banco (mantido)
+# Conexão com banco
 cursor, conn = conectar()
 cursor.execute("SELECT * FROM pedido")
 pedidos = cursor.fetchall()
 print(pedidos)
 conn.close()
+
