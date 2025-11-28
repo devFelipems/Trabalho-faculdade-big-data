@@ -5,6 +5,7 @@ from conectar import conectar
 
 EXCEL_PATH = "C:/bigdata/Planejamento (1).xlsx"
 
+
 # Função robusta para ler abas
 def read_sheet_robust(path, sheet_name, try_headers=(0,1,2,3,4)):
     last_df = None
@@ -61,24 +62,115 @@ df_reservas["Valor"] = pd.to_numeric(df_reservas["Valor"], errors="coerce")
 df_reservas = df_reservas.dropna(subset=["Valor"])
 
 # Criar gráficos
-fig1 = px.bar(df_resumo, x="Divisão", y=["Vlr de Pedido", "Valor Faturado"],
-              barmode="group", title="Pedidos vs Faturamento por Divisão")
+import plotly.express as px
 
-fig2 = px.line(df_assert, x="Data", y="Assertividade", markers=True,
-               title="Evolução da Assertividade")
+# ======================================================
+#  FIG 1 — Pedidos vs Faturamento por Divisão (AGORA PIZZA)
+# ======================================================
 
-fig3 = px.pie(df_reservas, names="Status", values="Valor",
-              title="Distribuição dos Pedidos por Status")
+df_resumo_pizza = pd.melt(
+    df_resumo,
+    id_vars="Divisão",
+    value_vars=["Vlr de Pedido", "Valor Faturado"],
+    var_name="Tipo",
+    value_name="Valor"
+)
 
-fig4 = px.bar(df_ciclo_std, x="Produto",
-              y=["Liberada", "Bloqueada", "Produção"],
-              barmode="stack", title="Status dos Pedidos por Produto")
+fig1 = px.pie(
+    df_resumo_pizza,
+    names="Tipo",         # Pizza com 2 fatias
+    values="Valor",       # Soma dos valores
+    title="Pedidos vs Faturamento por Divisão (Pizza)",
+    width=700, height=700 # QUADRADO
+)
+# Gráfico 2 – Evolução da Assertividade
+fig2 = px.line(
+    df_assert,
+    x="Data", y="Assertividade",
+    markers=True,
+    title="Evolução da Assertividade",
+    width=700, height=700  # QUADRADO
+)
 
-# Mostrar gráficos (cada um abre em uma aba)
-fig1.show()
-fig2.show()
-fig3.show()
-fig4.show()
+# Gráfico 3 – Pizza (maior)
+fig3 = px.pie(
+    df_reservas,
+    names="Status", values="Valor",
+    title="Distribuição dos Pedidos por Status",
+    hole=0,
+    width=900, height=900  # MAIOR
+)
+
+# Gráfico 4 – Status por Produto (AGORA LINE)
+fig4 = px.line(
+    df_ciclo_std,
+    x="Produto",
+    y=["Liberada", "Bloqueada", "Produção"],
+    markers=True,
+    title="Status dos Pedidos por Produto (Linha)",
+    width=700, height=700  # QUADRADO
+)
+
+
+from plotly.subplots import make_subplots
+import plotly.graph_objects as go
+
+# === CRIAR SUBPLOTS VERTICAIS (4 linhas x 1 coluna) ===
+fig_total = make_subplots(
+    rows=4, cols=1,
+    subplot_titles=[
+        "Pedidos vs Faturamento (Pizza)",
+        "Evolução da Assertividade",
+        "Distribuição dos Pedidos por Status",
+        "Status dos Pedidos por Produto (Linha)"
+    ],
+    specs=[
+        [{"type": "domain"}],  # Pizza
+        [{"type": "xy"}],      # Linha
+        [{"type": "domain"}],  # Pizza
+        [{"type": "xy"}]       # Linha
+    ]
+)
+
+# === ADICIONAR FIG1 (PIZZA) ===
+for trace in fig1.data:
+    fig_total.add_trace(trace, row=1, col=1)
+
+# === ADICIONAR FIG2 (LINE) ===
+for trace in fig2.data:
+    fig_total.add_trace(trace, row=2, col=1)
+
+# === ADICIONAR FIG3 (PIZZA) ===
+for trace in fig3.data:
+    fig_total.add_trace(trace, row=3, col=1)
+
+# === ADICIONAR FIG4 (LINE) ===
+for trace in fig4.data:
+    fig_total.add_trace(trace, row=4, col=1)
+
+
+# === TAMANHO TOTAL DA PÁGINA (4 gráficos empilhados) ===
+fig_total.update_layout(
+    height=3200,       # aumenta a altura total
+    width=1000,        # largura maior, mas ajustável
+    template="plotly_white",   # tema claro
+    title_text="Dashboard Big Data",
+    title_x=0.5,  # centraliza título
+    paper_bgcolor="#ffffff",   # fundo branco da página
+    plot_bgcolor="#e5e5e5",    # fundo branco dos gráficos
+    margin=dict(l=40, r=40, t=60, b=40),
+)
+
+
+fig_total.update_layout(
+    height=3500,
+    paper_bgcolor="#ffffff",   # fundo total cinza
+    plot_bgcolor="#e5e5e5"     # fundo dos gráficos cinza
+)
+
+# === MOSTRAR TUDO EM UMA ÚNICA ABA ===
+fig_total.show()
+
 
 #Chamar a função conectar
 cursor, conn = conectar()
