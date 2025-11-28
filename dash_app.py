@@ -15,7 +15,7 @@ def read_sheet_robust(path, sheet_name, try_headers=(0,1,2,3,4)):
             return df
     return last_df
 
-# Ler e tratar dados (igual ao main, sem mexer nele)
+# Ler e tratar dados
 df_resumo = read_sheet_robust(EXCEL_PATH, "resumo")
 df_assert = read_sheet_robust(EXCEL_PATH, "assertividade")
 df_ciclo = read_sheet_robust(EXCEL_PATH, "ciclo")
@@ -57,9 +57,7 @@ df_reservas = pd.concat([
 df_reservas["Valor"] = pd.to_numeric(df_reservas["Valor"], errors="coerce")
 df_reservas = df_reservas.dropna(subset=["Valor"])
 
-# ========================
 # GRÁFICOS
-# ========================
 
 # 1 — Pizza Pedidos vs Faturamento
 df_resumo_pizza = pd.melt(df_resumo, id_vars="Divisão",
@@ -81,14 +79,14 @@ fig3 = px.pie(df_reservas, names="Status", values="Valor",
 fig4 = px.line(df_ciclo_std, x="Produto", y=["Liberada", "Bloqueada", "Produção"],
                markers=True, title="Status dos Pedidos por Produto (Linha)")
 
-# 5 — Novo: Barras Reservas por Status
+# 5 — Barras Reservas por Status
 df_reservas_sum = df_reservas.groupby("Status", as_index=False)["Valor"].sum()
 fig5 = px.bar(df_reservas_sum, x="Status", y="Valor", color="Status",
               title="Total de Reservas por Status (Barras)")
 
-# ===========================
+
 # APP DASH COM 5 ABAS
-# ===========================
+
 app = Dash(__name__)
 app.layout = html.Div(
     style={"backgroundColor": "#f4f6f9", "minHeight": "100vh", "padding": "20px", "fontFamily": "Arial"},
@@ -106,3 +104,4 @@ app.layout = html.Div(
 
 if __name__ == "__main__":
     app.run(debug=True)
+
