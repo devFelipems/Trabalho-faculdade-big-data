@@ -1,9 +1,10 @@
 # main.py
 import pandas as pd
 import plotly.express as px
+import plotly.graph_objects as go
 from conectar import conectar
 
-EXCEL_PATH = "C:/bigdata/Planejamento (1).xlsx"
+EXCEL_PATH = r"C:\Trabalho big data python\Trabalho-faculdade-big-data\Planejamento (1).xlsx"
 
 
 # Função robusta para ler abas
@@ -75,30 +76,57 @@ df_resumo_pizza = pd.melt(
     var_name="Tipo",
     value_name="Valor"
 )
+# ========================
+# MELHORIAS VISUAIS GERAIS
+# ========================
+COLOR1 = "#4A90E2"   # Azul
+COLOR2 = "#FF6F61"   # Vermelho suave
+COLOR3 = "#50C878"   # Verde
+COLOR4 = "#F5A623"   # Amarelo
+FONT = "Arial"
 
 fig1 = px.pie(
     df_resumo_pizza,
     names="Tipo",         # Pizza com 2 fatias
     values="Valor",       # Soma dos valores
     title="Pedidos vs Faturamento por Divisão (Pizza)",
-    width=700, height=700 # QUADRADO
+    width=700, 
+    height=700, # QUADRADO
+    color="Tipo",
+    color_discrete_map={
+        "Vlr de Pedido": COLOR1,
+        "Valor Faturado": COLOR2
+    }
 )
+fig1.update_traces(textinfo="percent+label", pull=[0.03, 0.05])
+
 # Gráfico 2 – Evolução da Assertividade
 fig2 = px.line(
     df_assert,
-    x="Data", y="Assertividade",
+    x="Data", 
+    y="Assertividade",
     markers=True,
     title="Evolução da Assertividade",
-    width=700, height=700  # QUADRADO
+    width=700, 
+    height=700,  # QUADRADO
 )
+fig2.update_traces(line=dict(width=3, color=COLOR3))
+fig2.update_layout(yaxis_tickformat=".0%")
 
 # Gráfico 3 – Pizza (maior)
 fig3 = px.pie(
     df_reservas,
     names="Status", values="Valor",
     title="Distribuição dos Pedidos por Status",
-    hole=0,
-    width=900, height=900  # MAIOR
+    hole=0.35,
+    width=900, 
+    height=900,  # MAIOR
+    color="Status",
+    color_discrete_map={
+        "Parcial": COLOR1,
+        "Integral": COLOR3,
+        "Crédito": COLOR2
+    }
 )
 
 # Gráfico 4 – Status por Produto (AGORA LINE)
@@ -108,9 +136,10 @@ fig4 = px.line(
     y=["Liberada", "Bloqueada", "Produção"],
     markers=True,
     title="Status dos Pedidos por Produto (Linha)",
-    width=700, height=700  # QUADRADO
+    width=700, 
+    height=700,  # QUADRADO
 )
-
+fig4.update_traces(line=dict(width=2))
 
 from plotly.subplots import make_subplots
 import plotly.graph_objects as go
@@ -129,7 +158,9 @@ fig_total = make_subplots(
         [{"type": "xy"}],      # Linha
         [{"type": "domain"}],  # Pizza
         [{"type": "xy"}]       # Linha
-    ]
+    ],
+    vertical_spacing=0.1
+
 )
 
 # === ADICIONAR FIG1 (PIZZA) ===
@@ -151,23 +182,24 @@ for trace in fig4.data:
 
 # === TAMANHO TOTAL DA PÁGINA (4 gráficos empilhados) ===
 fig_total.update_layout(
-    height=3200,       # aumenta a altura total
-    width=1000,        # largura maior, mas ajustável
+    height=3500,       # aumenta a altura total
+    width=1100,        # largura maior, mas ajustável
     template="plotly_white",   # tema claro
     title_text="Dashboard Big Data",
     title_x=0.5,  # centraliza título
+    title_font=dict(size=26),
     paper_bgcolor="#ffffff",   # fundo branco da página
-    plot_bgcolor="#e5e5e5",    # fundo branco dos gráficos
+    plot_bgcolor="#fafafa",    # fundo branco dos gráficos
     margin=dict(l=40, r=40, t=60, b=40),
+    font=dict(family=FONT, size=16, color="#333"),
 )
 
-
-fig_total.update_layout(
-    height=3500,
-    paper_bgcolor="#ffffff",   # fundo total cinza
-    plot_bgcolor="#e5e5e5"     # fundo dos gráficos cinza
+fig_total.update_yaxes(
+    showgrid=True, gridcolor="lightgray", zeroline=False
 )
-
+fig_total.update_xaxes(
+    showgrid=False, tickangle=45
+)
 # === MOSTRAR TUDO EM UMA ÚNICA ABA ===
 fig_total.show()
 

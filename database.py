@@ -1,0 +1,19 @@
+import sqlite3 
+
+con = sqlite3.connect("database.db")
+cur = con.cursor
+
+cur.execute("CREATE TABLE pedido(produto, quantidade)")
+cur.execute("""
+            INSERT INTO pedido VALUES
+            ('Filtro Dfr-22', 10)
+            ('Bomba Pratika PF-22W', 220)
+            ('Bomba Pratika PF-17W', 1199)
+            ('Filtro Dfr-19', 5)
+            ('Bomba Cam-w6', 2)
+            ('Bomba 709 S', 7)
+            ('Bomba 725 TJM', 1)""")
+con.commit()
+con.close()
+
+
